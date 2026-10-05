@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f3ede1">
+<title>MED | تصميم وبرمجة المواقع</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Montserrat:wght@500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+</head>
+<body>
+
+<header class="site-header">
+<button class="mobile-menu" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+<a class="logo" onclick="show('home')">MED</a>
+<nav id="mainNav">
+<button onclick="show('home')" data-i18n="home">الرئيسية</button>
+<button onclick="show('services')" data-i18n="services">خدماتنا</button>
+<button onclick="show('portfolio')" data-i18n="portfolio">أعمالنا</button>
+<button onclick="openRequest()" data-i18n="order">اطلب موقعك</button>
+<button id="loginButton" onclick="openLogin()" data-i18n="login">تسجيل الدخول</button>
+<button id="adminButton" class="admin-nav-button" onclick="openAdminDashboard()">Admin</button>
+<button id="logoutButton" class="logout-button" onclick="logout()" data-i18n="logout">تسجيل الخروج</button>
+<select id="languageSelect" onchange="changeLanguage(this.value)">
+<option value="ar">العربية</option>
+<option value="fr">Français</option>
+<option value="en">English</option>
+</select>
+</nav>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="page active">
+<div class="hero">
+<div class="hero-content">
+<span class="eyebrow">MED WEB STUDIO</span>
+<h1 data-i18n="heroTitle">نصنع لك موقعًا احترافيًا يخدم عملك</h1>
+<p data-i18n="heroText">MED متخصصة في تصميم وبرمجة المواقع الإلكترونية: مواقع تعريفية، متاجر إلكترونية وصفحات هبوط بتصاميم عصرية وسريعة.</p>
+<button class="primary-btn" onclick="openRequest()" data-i18n="orderNow">اطلب موقعك الآن →</button>
+</div>
+</div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="page">
+<div class="section-heading">
+<span class="eyebrow">MED SERVICES</span>
+<h2 data-i18n="servicesTitle">خدماتنا</h2>
+<p data-i18n="servicesText">كل ما تحتاجه لتكون حاضرًا على الإنترنت.</p>
+</div>
+<div class="services-grid">
+<article class="card service-card"><h3 data-i18n="s1t">موقع تعريفي</h3><p data-i18n="s1d">موقع يعرّف بنشاطك أو شركتك بشكل واضح ومحترف.</p></article>
+<article class="card service-card"><h3 data-i18n="s3t">صفحة هبوط</h3><p data-i18n="s3d">صفحة واحدة مصممة لجذب الزبائن وزيادة الطلبات.</p></article>
+<article class="card service-card"><h3 data-i18n="s4t">لوحة تحكم</h3><p data-i18n="s4d">لوحة إدارة لتعديل محتوى موقعك بنفسك.</p></article>
+<article class="card service-card"><h3 data-i18n="s5t">تصميم متجاوب</h3><p data-i18n="s5d">مواقع تعمل بشكل ممتاز على الهاتف والحاسوب.</p></article>
+<article class="card service-card"><h3 data-i18n="s6t">صيانة وتطوير</h3><p data-i18n="s6d">تحديث وتحسين موقعك الحالي وإضافة ميزات جديدة.</p></article>
+</div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" class="page">
+<div class="section-heading">
+<span class="eyebrow">MED</span>
+<h2 data-i18n="portfolioTitle">أعمالنا</h2>
+<p data-i18n="portfolioText">المواقع والمشاريع التي صنعتها MED.</p>
+</div>
+<div id="portfolioContainer" class="portfolio-grid"></div>
+</section>
+
+<!-- LOGIN -->
+<div id="loginModal" class="modal">
+<div class="modal-box">
+<button class="close-modal" onclick="closeLogin()">×</button>
+<span class="eyebrow">MED</span>
+<h2 data-i18n="loginTitle">تسجيل الدخول</h2>
+<input id="usernameInput" type="text" placeholder="اسم المستخدم">
+<input id="passwordInput" type="password" placeholder="كلمة المرور">
+<button class="primary-btn full" onclick="login()" data-i18n="login">تسجيل الدخول</button>
+<p id="loginMessage"></p>
+</div>
+</div>
+
+<!-- REQUEST -->
+<div id="orderModal" class="modal">
+<div class="modal-box order-box">
+<button class="close-modal" onclick="closeOrder()">×</button>
+<span class="eyebrow">MED REQUEST</span>
+<h2>طلب موقع جديد</h2>
+<p class="order-summary">أخبرنا عن مشروعك وسنتواصل معك عبر WhatsApp.</p>
+
+<div id="orderFormFields">
+<label>الاسم <span class="required">*</span></label>
+<input id="orderUsername" placeholder="اسمك">
+
+<label>WhatsApp <span class="required">*</span></label>
+<input id="orderWhatsApp" type="tel" placeholder="216XXXXXXXX">
+
+<label>نوع الموقع <span class="required">*</span></label>
+<select id="orderType">
+<option value="">اختر نوع الموقع</option>
+<option value="موقع تعريفي">موقع تعريفي</option>
+<option value="صفحة هبوط">صفحة هبوط</option>
+<option value="لوحة تحكم">لوحة تحكم</option>
+<option value="تطوير موقع موجود">تطوير موقع موجود</option>
+<option value="آخر">آخر</option>
+</select>
+
+<label>تفاصيل المشروع <span class="required">*</span></label>
+<textarea id="orderDetails" rows="4" placeholder="ما هو نشاطك؟ وماذا تريد في موقعك؟"></textarea>
+
+<button class="primary-btn full" onclick="reviewOrder()">مراجعة الطلب</button>
+<p id="orderMessage"></p>
+</div>
+
+<div id="orderReview" class="order-review" style="display:none">
+<h3>مراجعة الطلب</h3>
+<div id="orderReviewContent"></div>
+<div class="review-actions">
+<button class="secondary-btn" onclick="backToOrderForm()">تعديل</button>
+<button class="primary-btn" onclick="confirmAndSendOrder()">تأكيد الطلب</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ADMIN -->
+<section id="adminDashboard" class="page admin-page">
+<div class="admin-header">
+<div>
+<span class="eyebrow">MED ADMIN</span>
+<h2>Admin Dashboard</h2>
+<p class="admin-note">إدارة طلبات المواقع والأعمال.</p>
+</div>
+<button class="secondary-btn" onclick="show('home')">العودة للموقع</button>
+</div>
+
+<div class="admin-tabs">
+<button class="admin-tab active" onclick="openAdminTab('ordersAdmin',this)">REQUESTS</button>
+<button class="admin-tab" onclick="openAdminTab('portfolioAdmin',this)">PORTFOLIO</button>
+<button class="admin-tab" onclick="openAdminTab('settingsAdmin',this)">SETTINGS</button>
+</div>
+
+<div id="ordersAdmin" class="admin-content active">
+<div class="admin-panel">
+<div class="admin-panel-heading">
+<div>
+<h3>📦 طلبات المواقع</h3>
+<p class="admin-note">الطلبات المحفوظة في قاعدة البيانات.</p>
+</div>
+<button class="secondary-btn" onclick="renderAdminOrders()">تحديث</button>
+</div>
+<div id="adminOrders"></div>
+</div>
+</div>
+
+<div id="portfolioAdmin" class="admin-content">
+<div class="admin-panel">
+<h3>➕ إضافة مشروع</h3>
+<input id="portfolioName" placeholder="اسم المشروع">
+<input id="portfolioDescription" placeholder="وصف المشروع">
+<input id="portfolioUrl" type="url" placeholder="رابط الموقع">
+<input id="portfolioYear" placeholder="السنة">
+<label class="file-label">Upload Thumbnail
+<input id="portfolioImageFile" type="file" accept="image/*"></label>
+<input id="portfolioImageUrl" type="url" placeholder="رابط Thumbnail اختياري">
+<button class="admin-add-button" onclick="addPortfolioProject()">إضافة المشروع</button>
+</div>
+<div class="admin-panel">
+<h3>Portfolio Projects</h3>
+<div id="adminPortfolio"></div>
+</div>
+</div>
+
+<div id="settingsAdmin" class="admin-content">
+<div class="admin-panel">
+<h3>🔐 Admin Password</h3>
+<input id="currentAdminPassword" type="password" placeholder="كلمة السر الحالية">
+<input id="newAdminPassword" type="password" placeholder="كلمة السر الجديدة">
+<input id="confirmAdminPassword" type="password" placeholder="تأكيد كلمة السر الجديدة">
+<button class="admin-add-button" onclick="changeAdminPassword()">تغيير كلمة السر</button>
+<p class="admin-note security-warning">ملاحظة: قاعدة البيانات السحابية تحتاج أيضًا إلى إعداد Firestore Security Rules قبل نشر الموقع بشكل عام.</p>
+</div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<strong>MED</strong>
+<p>© 2026 MED. Tous droits réservés.</p>
+<div class="footer-links">
+<button onclick="show('home')">Home</button>
+<button onclick="show('services')">Services</button>
+<button onclick="show('portfolio')">Portfolio</button>
+</div>
+</footer>
+
+<div class="whatsapp-float" onclick="whatsapp()" aria-label="WhatsApp">◔</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>
